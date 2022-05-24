@@ -39,7 +39,7 @@ to your cluster containing your secondary Consul datacenter `dc2` and run the
 following command:
 
 ```shell
-$ kubectl exec statefulset/consul-server --namespace=consul -- consul catalog services -datacenter dc2
+$ kubectl exec statefulset/consul-server --namespace=consul -- consul catalog services -datacenter dc1
 ```
 
 ## Required Variables
