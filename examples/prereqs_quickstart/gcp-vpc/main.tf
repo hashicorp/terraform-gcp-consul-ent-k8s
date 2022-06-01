@@ -18,16 +18,42 @@ module "test_vpc_module" {
 
   subnets = [
     {
-      subnet_name   = "subnet-01"
-      subnet_ip     = "10.10.10.0/24"
-      subnet_region = var.region
+      subnet_name           = "subnet-01"
+      subnet_ip             = "10.10.10.0/24"
+      subnet_region         = var.region
+      subnet_private_access = true
     },
     {
-      subnet_name   = "subnet-02"
-      subnet_ip     = "10.10.20.0/24"
-      subnet_region = var.region
+      subnet_name           = "subnet-02"
+      subnet_ip             = "10.10.20.0/24"
+      subnet_region         = var.region
+      subnet_private_access = true
     }
   ]
+
+  secondary_ranges = {
+    subnet-01 = [
+      {
+        ip_cidr_range = "10.36.0.0/14"
+        range_name    = "pods-range"
+      },
+      {
+        ip_cidr_range = "10.40.0.0/20"
+        range_name    = "services-range"
+      },
+    ]
+
+    subnet-02 = [
+      {
+        ip_cidr_range = "10.144.0.0/14"
+        range_name    = "pods-range"
+      },
+      {
+        ip_cidr_range = "10.148.0.0/20"
+        range_name    = "services-range"
+      },
+    ]
+  }
 }
 
 #NAT router

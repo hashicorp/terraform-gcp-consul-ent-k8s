@@ -11,12 +11,6 @@ variable "add_master_webhook_firewall_rules" {
   description = "Create master_webhook firewall rules for ports defined in `firewall_inbound_ports`"
 }
 
-variable "cluster_ipv4_cidr_block" {
-  type        = string
-  default     = ""
-  description = "The IP address range of the Kubernetes pods in this cluster in CIDR notation. Set to blank to have a range chosen with the default size"
-}
-
 variable "cluster_name" {
   type        = string
   description = "The name to give the new Kubernetes cluster"
@@ -74,6 +68,12 @@ variable "oauth_scopes_default" {
   description = "The set of Google API scopes to be made available on all of the node VMs under the default service account for the default node pool"
 }
 
+variable "pods_range_name" {
+  type        = string
+  default     = "pods-range"
+  description = "Name of subnet secondary range for pods"
+}
+
 variable "project_id" {
   type        = string
   description = "The project ID to host the network in"
@@ -84,10 +84,10 @@ variable "region" {
   description = "GCP region in which to launch resources"
 }
 
-variable "services_ipv4_cidr_block" {
+variable "services_range_name" {
   type        = string
-  default     = ""
-  description = "The IP address range of the services IPs in this cluster. Set to blank to have a range chosen with the default size"
+  default     = "services-range"
+  description = "Name of subnet secondary range for services"
 }
 
 variable "subnetwork" {

@@ -15,6 +15,12 @@ variable "gke_2_cluster_name" {
   description = "The name to give the secondary Consul Kubernetes cluster"
 }
 
+variable "network_name" {
+  type        = string
+  default     = "consul-test-network"
+  description = "The name of the VPC network being created"
+}
+
 variable "primary_master_ipv4_cidr_block" {
   type        = string
   default     = "172.16.0.0/28"
