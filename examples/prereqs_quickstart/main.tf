@@ -11,9 +11,10 @@ provider "google" {
 }
 
 module "gcp-vpc" {
-  source     = "./gcp-vpc/"
-  project_id = var.project_id
-  region     = var.region
+  source       = "./gcp-vpc/"
+  network_name = var.network_name
+  project_id   = var.project_id
+  region       = var.region
 }
 
 module "gke-cluster-1" {
@@ -24,6 +25,8 @@ module "gke-cluster-1" {
   project_id             = var.project_id
   region                 = var.region
   subnetwork             = module.gcp-vpc.subnetworks[0]
+  pods_range_name        = module.gcp-vpc.subnets_secondary_ranges[0][0]["range_name"]
+  services_range_name    = module.gcp-vpc.subnets_secondary_ranges[0][1]["range_name"]
 }
 
 module "gke-cluster-2" {
@@ -34,6 +37,8 @@ module "gke-cluster-2" {
   project_id             = var.project_id
   region                 = var.region
   subnetwork             = module.gcp-vpc.subnetworks[1]
+  pods_range_name        = module.gcp-vpc.subnets_secondary_ranges[1][0]["range_name"]
+  services_range_name    = module.gcp-vpc.subnets_secondary_ranges[1][1]["range_name"]
 }
 
 module "secret-manager" {
