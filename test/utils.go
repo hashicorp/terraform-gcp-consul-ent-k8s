@@ -210,49 +210,55 @@ func removeAutoTfvars(t *testing.T, path string) {
 	}
 }
 
-// Get current application default credentials quota project id
+// Get currently configured GCP project id.
+// On developer workstation, retrieve from application default credentials quota project id;
+// on CI, check the GCP_PROJECT env var
 func getGCloudProjectId(t *testing.T) string {
-	homedir, err := os.UserHomeDir()
-	if err != nil {
-		logger.Log(t, "")
-		logger.Log(t, "Error retrieving user home directory")
-		logger.Log(t, "")
-		logger.Log(t, err)
-		logger.Log(t, "")
-		t.FailNow()
+	if os.Getenv("GCP_PROJECT") != "" {
+		return os.Getenv("GCP_PROJECT")
+	} else {
+		homedir, err := os.UserHomeDir()
+		if err != nil {
+			logger.Log(t, "")
+			logger.Log(t, "Error retrieving user home directory")
+			logger.Log(t, "")
+			logger.Log(t, err)
+			logger.Log(t, "")
+			t.FailNow()
+		}
+
+		adcFile, err := ioutil.ReadFile(filepath.Join(homedir, ".config", "gcloud", "application_default_credentials.json"))
+		if err != nil {
+			logger.Log(t, "")
+			logger.Log(t, "Error reading gcloud application_default_credentials.json")
+			logger.Log(t, "(Did you login and set a default quota project? See README)")
+			logger.Log(t, "")
+			logger.Log(t, err)
+			logger.Log(t, "")
+			t.FailNow()
+		}
+
+		adcData := GcloudAdcJson{}
+
+		err = json.Unmarshal([]byte(adcFile), &adcData)
+		if err != nil {
+			logger.Log(t, "")
+			logger.Log(t, "Error parsing gcloud application_default_credentials.json")
+			logger.Log(t, "")
+			logger.Log(t, err)
+			logger.Log(t, "")
+			t.FailNow()
+		}
+
+		if adcData.QuotaProjectId == "" {
+			logger.Log(t, "")
+			logger.Log(t, "Unable to determine project id from gcloud (have you run \"gcloud auth application-default set-quota-project <PROJECTID>\"?)")
+			logger.Log(t, "")
+			t.FailNow()
+		}
+
+		return adcData.QuotaProjectId
 	}
-
-	adcFile, err := ioutil.ReadFile(filepath.Join(homedir, ".config", "gcloud", "application_default_credentials.json"))
-	if err != nil {
-		logger.Log(t, "")
-		logger.Log(t, "Error reading gcloud application_default_credentials.json")
-		logger.Log(t, "(Did you login and set a default quota project? See README)")
-		logger.Log(t, "")
-		logger.Log(t, err)
-		logger.Log(t, "")
-		t.FailNow()
-	}
-
-	adcData := GcloudAdcJson{}
-
-	err = json.Unmarshal([]byte(adcFile), &adcData)
-	if err != nil {
-		logger.Log(t, "")
-		logger.Log(t, "Error parsing gcloud application_default_credentials.json")
-		logger.Log(t, "")
-		logger.Log(t, err)
-		logger.Log(t, "")
-		t.FailNow()
-	}
-
-	if adcData.QuotaProjectId == "" {
-		logger.Log(t, "")
-		logger.Log(t, "Unable to determine project id from gcloud (have you run \"gcloud auth application-default set-quota-project <PROJECTID>\"?)")
-		logger.Log(t, "")
-		t.FailNow()
-	}
-
-	return adcData.QuotaProjectId
 }
 
 // Persist Terraform Workspace name so users can run diagnostic
